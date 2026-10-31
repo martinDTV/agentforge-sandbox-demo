@@ -2,6 +2,8 @@
 
 import re
 
+from mailcheck.normalize import normalize_email
+
 _LOCAL_RE = re.compile(r"^[A-Za-z0-9._%+\-]+$")
 _LABEL_RE = re.compile(r"^[A-Za-z0-9]([A-Za-z0-9\-]*[A-Za-z0-9])?$")
 _TLD_RE = re.compile(r"^[A-Za-z]{2,}$")
@@ -11,6 +13,9 @@ def validate_email(address: str) -> bool:
     """Devuelve True si ``address`` cumple las reglas descritas en README.md."""
     if not isinstance(address, str):
         raise TypeError(f"Expected str, got {type(address).__name__}")
+
+    # Normalize: lowercase domain only, local part intact
+    address = normalize_email(address)
 
     # Rule 6: no whitespace
     if any(c.isspace() for c in address):
