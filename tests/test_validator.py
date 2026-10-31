@@ -107,3 +107,23 @@ def test_trailing_space_invalid() -> None:
 def test_non_string_raises_type_error(value: object) -> None:
     with pytest.raises(TypeError):
         validate_email(value)  # type: ignore[arg-type]
+
+
+def test_normalize_uppercase_domain_valid() -> None:
+    """Uppercase domain is normalised to lowercase before validation."""
+    assert validate_email("user@EXAMPLE.COM") is True
+
+
+def test_normalize_mixed_case_domain_valid() -> None:
+    """Mixed-case domain is normalised; local part case is preserved."""
+    assert validate_email("First.Last+tag@Sub.Example.ORG") is True
+
+
+def test_normalize_does_not_accept_digit_tld() -> None:
+    """Normalisation does not turn an invalid TLD with digits into valid."""
+    assert validate_email("user@EXAMPLE.C0M") is False
+
+
+def test_normalize_does_not_accept_single_label_domain() -> None:
+    """Normalisation does not fix a missing dot in the domain."""
+    assert validate_email("user@LOCALHOST") is False
